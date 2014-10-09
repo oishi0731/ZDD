@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="pragma" content="no-cache" />
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-store, must-revalidate"> 
+<title>sign in</title>
+<link rel="stylesheet" type="text/css" href="css/SignIn.css">
+<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="js/check.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/json2.js"></script>
+<script type="text/javascript" src="Lang/lang.js"></script>
+<script>
+
+var langtype=getCookie("lang");
+var lang=new JsLanguage(langtype);
+var jsLangArr=lang.getLangArr();
+
+
+function clearErrorMsg()
+{
+	document.getElementById("tipMsg").innerHTML="";
+}
+
+function loginsys(){
+	var account=document.getElementById("Inaccount").value;
+	var password=document.getElementById("InPassword").value;
+	if(account=="" || account==document.getElementById("Inaccount").defaultValue)
+	{
+		document.getElementById("tipMsg").innerHTML="请输入账号.";
+		return;
+	}
+	
+	var str="";
+	if((str=checkUserNameEx(trim(document.getElementById("Inaccount").value))) !="")
+	{
+		document.getElementById("tipMsg").innerHTML=str;
+		//document.getElementById("Inaccount").focus();
+		return;
+	}
+	setCookie("username",account,30);
+		
+		var json={"cmd":"login","data":{"account":"","password":""}};
+		json["data"]["account"]=account;
+		json["data"]["password"]=password;
+		
+		$.post("/action",json,function callback(ret_data,status){
+		if(ret_data!=null &&ret_data!="")
+		{			
+			var arr;
+			try
+			{
+				arr=JSON.parse(ret_data);
+			}
+			catch(err)
+			{
+				arr=eval(ret_data);	
+			}
+			
+			if(arr["code"]!=undefined &&arr["code"]==0)
+			{
+				//alert("登录成功");	
+				window.location="Camera.html";
+			}
+			else
+			{
+				document.getElementById("tipMsg").innerHTML=arr["desc"];
+			}
+		}
+	
+	});
+
+	
+}
+</script>
+</head>
+<body>
+	
+	<div id="top">
+		<div id="d_live"><a  href="Home.html"><img id="" src="images/flag.png" /><span>Pi-live</span></a></div>		
+	</div>	
+ 	
+	<div id="center">
+		<!-- <div id="left" class="c_left">
+			<img id="" src="images/xingkong.png" />
+		</div> -->
+		<div class="content-title" >登录</div>
+		<hr style="width:870px;margin:10px 0px 0px 0px;float:left;">
+		<div id="right">
+			
+			<form  id="signOnform">
+				<div id="errorMsg" >
+					<span id="tipMsg"></span> 
+				</div>
+				<div style="margin-top:10px;float:left;"><div class="c_label_l" >账号:</div><input type="text" id="Inaccount"    name="username"    value ="账号" maxlength="20" onfocus="onclick1('Inaccount');" onBlur="onBlur1('Inaccount');clearErrorMsg();"/></div>
+				<div style="margin-top:10px;float:left;"><div class="c_label_l">密码:</div><input type="text" id="InPasswordtip"   name="InPasswordtip"   value ="密码" onfocus="onclick2('InPasswordtip','InPassword');" />
+					<input type="password" id="InPassword"   name="password"   value="" maxlength="20" onBlur="onBlur2('InPassword','InPasswordtip');clearErrorMsg();" /> 
+		 		</div>
+				<div style="margin-top:10px;float:left;"><input id="cb_remember" type="checkbox" checked>记住密码</div>
+				<div style="margin-top:10px;float:left;"><input type ="button" id="submitIn"  value ="登录" onclick="loginsys();"></div>
+			</form>	
+			<div style="float:left;margin:20px 0px 0px 200px;"><a href="SignUp.html" style="float: left">创建账号</a>
+			<span class="c_line" ></span>
+			<a href="ResetPassword.html" style="float: left">忘记密码?</a></div>
+		</div>
+	</div>
+	  	
+ 	<div style="margin-top: 50px;">
+		<!-- <hr style="width: 80%; height: 2px;" size="1" color="#666666"> -->
+		<div style="text-align: center;height:50px;margin-bottom:20px;min-width:800px;background-color:#DDDDDD;line-height:50px;">
+			<span>Copyright © 2003–2014,TVT.CN,All Rights Reserved.</span>
+		</div>
+	</div>
+</body>
+</html>

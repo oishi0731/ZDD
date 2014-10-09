@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>账号管理</title>
+<link rel="stylesheet" type="text/css" href="css/account.css" />
+<link rel="stylesheet" type="text/css" href="css/dropdown.css">
+<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/input.js"></script>
+<script type="text/javascript" src="js/check.js"></script>
+<script type="text/javascript" src="Lang/lang.js"></script>
+<script type="text/javascript">
+
+var changeNickName=false;
+var changePassWordFlag=false;
+function change()
+{
+	changeNickName=true;
+}
+function showTipMsg(strmsg)
+{
+	document.getElementById('msgtext').innerHTML=strmsg;
+	document.getElementById('msgtext').style.display='inline-block';
+}
+function hideTipMsg()
+{
+	document.getElementById('msgtext').innerHTML="";
+	document.getElementById('msgtext').style.display='none';
+	
+}
+
+function showRedirctMsg()
+{
+	document.getElementById("divMsg").style.display='inline';
+	setTimeout("window.location='Camera.html'",3000);
+	
+}
+var jsLangArr;
+window.onload=function(){
+	
+	var langtype=getCookie("lang");
+	var lang=new JsLanguage(langtype);
+	jsLangArr=lang.getLangArr();
+
+	$.post("/action",{"cmd":"account_info","data":{}},function callback(ret_data,status){
+		var arr;
+		try
+		{
+			arr=JSON.parse(ret_data);
+		}
+		catch(err)
+		{
+			arr=eval(ret_data);	
+		}
+		
+		if(arr["code"]!=undefined &&arr["code"]==0)
+		{
+			//document.getElementById("username").innerHTML=arr["data"]["username"];
+			document.getElementById("nickname").value=arr["data"]["nick_name"];
+			document.getElementById("cellphone").value=arr["data"]["cellphone"];
+		}
+		else
+		{
+			alert("请先登录.");
+			window.location="SignIn.html";
+		}
+		});
+}
+
+
+function modifyUserinfo()
+{
+	var nickname=document.getElementById("nickname").value;
+	var cellphone=document.getElementById("cellphone").value;
+	if(nickname=="")
+	{
+		showTipMsg("昵称不可为空.");
+		return false;
+	}
+	var json={"cmd":"update_account_info","data":{"nick_name":"","cellphone":""}};
+	
+	json["data"]["nick_name"]=nickname;
+	json["data"]["cellphone"]=cellphone;
+	
+	$.post("/action",json,function callback(ret_data,status){
+		var arr;
+		try
+		{
+			arr=JSON.parse(ret_data);
+		}
+		catch(err)
+		{
+			arr=eval(ret_data);	
+		}
+		
+		if(arr["code"]!=undefined &&arr["code"]==0)
+		{
+			showTipMsg("修改信息成功.");
+			changeNickName=false;
+		}
+		else
+		{
+			showTipMsg(arr["desc"]);
+		}
+	});
+	
+}
+
+function modifyPassword()
+{
+	var old_password=document.getElementById("old_passwd").value;
+	var new_password=document.getElementById("new_passwd").value;
+	
+	var json={"cmd":"modify_password","data":{"old_password":"","new_password":""}};
+	json["data"]["old_password"]=old_password;
+	json["data"]["new_password"]=new_password;
+	
+	$.post("/action",json,function callback(ret_data,status){
+		var arr;
+		try
+		{
+			arr=JSON.parse(ret_data);
+		}
+		catch(err)
+		{
+			arr=eval(ret_data);	
+		}
+		
+		if(arr["code"]!=undefined &&arr["code"]==0)
+		{
+			alert("修改密码成功.");
+			changePassWordFlag=false;
+		}		
+		else
+		{
+			showTipMsg(arr["desc"]);
+		}
+	});
+	
+}	
+
+</script>
+</head>
+<body>
+<div id="top">
+		<div id="d_live">
+			<a  href="Home.html"><img id="" src="images/flag.png" /><span>Pi-live</span></a>
+		</div>	
+		<div style="float:right;margin:20px 30px 0px 0px;"><a href="Camera.html">MyCamera</a></div>
+		<div style="float:right;margin:20px 20px 0px 0px;"><a href="Home.html">Home</a></div>		
+  	</div>	
+  
+  	<div id="center">
+	  	<div id="left">
+	  	<h3 style="margin:100px 0px 0px 60px;font-size:20px;">账号信息</h3>
+	  	<!-- <div style="margin:40px 0px 0px 40px;font-size:20px;"><span style="width:150px;text-align:right;float:left;">账号:</span><span id="username" style="margin-left:20px;">...</span></div> -->
+	    <div style="font-size:20px;"><span class="s_text">昵称:</span><input type="text" id="nickname" class="i_text" maxlength="30" onchange="change();OnChangeCheck(this,30);" onblur="hideTipMsg();" onkeyup="KeyupCheck(this,30);"></div>
+	     <div style="font-size:20px;"><span class="s_text">手机号:</span><input type="text" id="cellphone" class="i_text" maxlength="11" onchange="change();" onblur="hideTipMsg();"></div> 
+	  	</div>
+	  	<div class="c_line"></div>
+	  	<div id="right">
+	  	<h3 style="margin:100px 0px 20px 100px">修改密码</h3>
+	  	<div>
+	  		<div class="d_text">
+				<span  class="s_text">旧密码:</span><input id="old_passwd" type="password" class="i_text"   maxlength="20" onfocus="" onchange="changePassWordFlag=true;" onblur="hideTipMsg();">
+			</div>
+			<div class="d_text">
+				<span  class="s_text">新密码:</span><input id="new_passwd" type="password" class="i_text" maxlength="20" style="width: 160" onchange="changePassWordFlag=true;" onblur="hideTipMsg();">
+			</div>
+			<div class="d_text">
+				<span  class="s_text">确认密码:</span><input id="new_confirmpasswd"  class="i_text" type="password" maxlength="20" style="width: 160" onchange="changePassWordFlag=true;" onblur="hideTipMsg();">
+			</div>
+			<div class="d_text">
+				<input id="btnpasswd" type="button"  value="提交" onclick="if(changeNickName!=true&&changePassWordFlag!=true)showTipMsg(jsLangArr.InfoChangedCheck);if(changeNickName==true)modifyUserinfo();if(changePassWordFlag==true)modifyPassword(); ">
+			</div>
+			<div id="msgtext" style="display:none;margin:40px 0px 0px 100px;color:red;"></div>
+	  	</div>
+	  	</div>
+	</div> 
+	<!-- <div><input type="button" value="当前用户" onclick="getUser();"></div>  -->
+	<div style="margin-top: 50px;">
+		<!-- <hr style="width: 80%; height: 2px;" size="1" color="#666666"> -->
+		<div style="text-align: center;height:50px;margin-bottom:20px;min-width:1100px;background-color:#DDDDDD;line-height:50px;">
+			<span>Copyright © 2003–2014,TVT.CN,All Rights Reserved.</span>
+		</div>
+	</div>
+  		
+  		
+  	<div id="divMsg" style="display:none">
+  		<div id="show_msg" class="showMsg">
+	  		<div style="margin:50px 0px 0px 0px;height:150px;font-size:24px;">
+	  			<span id="msgtext" >修改成功</span>
+	  		</div>
+	  		<div id="note" style="font-size:14px;">3秒后自动跳转到设备列表页面。</div>
+  		</div>
+  	</div>
+</body>
+</html>

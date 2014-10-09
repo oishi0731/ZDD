@@ -1,0 +1,720 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Cache-Control" content="no-cache" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Camera</title>
+<link rel="stylesheet" type="text/css" href="css/camera.css">
+<link rel="stylesheet" type="text/css" href="css/dropdown.css">
+<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/json2.js"></script>
+<script type="text/javascript" src="js/camera.js"></script>
+<script type="text/javascript">
+var ocx_display="";
+var plugin="";
+//滑动控制
+var stop=0;
+var int =0;
+function filmSlide(index)
+{
+	//alert('获取好友列表失败1。')
+	obj=document.getElementById('devicelist_ul');
+	//index = 'left';
+	var left = obj.offsetLeft+20;
+	var right= obj.offsetLeft-20;
+	var node= document.getElementsByTagName("li");
+	var len= node.length;
+	 if(index == 1 )
+	 {	
+		 if(obj.offsetLeft < 0)
+		 {
+			 obj.style.left=left+"px";	 
+		 }
+		 else 
+		 {
+			 window.clearInterval(int);
+			 return;
+		 }
+     }  
+	
+	 if(index == 2)
+	 {
+		 if(obj.offsetLeft > 0-(len-4)*200)
+		 {
+			  obj.style.left=right+"px";
+		 }
+		 else 
+		 {
+			 window.clearInterval(int);
+			 return;
+		 }
+     } 
+     stop=stop+1;
+    // alert(stop);
+     if(stop == 10)
+     {
+    	 window.clearInterval(int);
+    	 stop=0;
+     }
+}
+
+function MoveVertical(direct,length)
+{
+	obj=document.getElementById('slide_scroll');
+	var length=length /10;//分10次移动
+	if(direct == "up")
+	{
+		if(obj.scrollTop > length)
+		{
+			obj.scrollTop=obj.scrollTop-length;
+		}
+		else
+		{
+			obj.scrollTop=0;
+		}
+	}
+
+	if(direct == "down")
+	{
+		if(obj.scrollHeight-obj.scrollTop >length)
+		{
+			obj.scrollTop=obj.scrollTop+length;
+		}
+		else
+		{
+			obj.scrollTop=obj.scrollHeight;
+		}
+	}
+	 stop=stop+1;
+    // alert(stop);
+     if(stop == 10)
+     {
+    	 window.clearInterval(int);
+    	 stop=0;
+     }
+}
+
+window.onload=function(){
+	$.post("/action",{"cmd":"account_info","data":{}},function callback(ret_data,status){
+		var arr;
+		try
+		{
+			arr=JSON.parse(ret_data);
+		}
+		catch(err)
+		{
+			arr=eval(ret_data);	
+		}
+		
+		if(arr["code"]!=undefined &&arr["code"]==0)
+		{
+			document.getElementById("username").innerHTML=arr["data"]["nick_name"];	
+			get_device_list();
+		}
+		else
+		{
+			alert("请先登录.");
+			window.location="SignIn.html";
+		}
+		});
+	get_plugin();
+}	
+
+
+function signOut()
+{
+	$.post("/action",{"cmd":"logout","data":{"account":""}},function callback(ret_data,status){
+		setCookie("username","",30);
+		window.location="Home.html";
+	});	
+}
+
+function addDeivce()
+{
+	var account="001";
+	var device_sn="102550225555";
+	var type="ipc";
+	var ip="192.168.0.2";
+	var port=8080;
+	var name="jiaju";
+	
+	var json={"cmd":"add_device","data":{"account":"","device_sn":"","type":"","ip":"","port":"","name":""}};
+	json["data"]["account"]=account;
+	json["data"]["device_sn"]=device_sn;
+	json["data"]["type"]=type;
+	json["data"]["ip"]=ip;
+	json["data"]["port"]=port;
+	json["data"]["name"]=name;
+	
+	$.post("/action",json,function callback(ret_data,status){
+		if(ret_data!=null &&ret_data!="")
+		{
+			var arr;
+			try
+			{
+				arr=JSON.parse(ret_data);
+			}
+			catch(err)
+			{
+				arr=eval(ret_data);	
+			}
+			
+			if(arr["code"]!=undefined &&arr["code"]==0)
+			{			
+					//document.getElementById("tipMsg").innerHTML="添加设备成功.";
+					alert("添加设备成功.");
+			}
+			else
+			{
+				alert(arr["desc"]);
+			}
+		}
+		
+	});
+	
+}
+
+var arrdevice=null;
+var devicelist;
+var retReq=false;
+function get_device_list()
+{
+	var account=getCookie("username");
+	
+	var json={"cmd":"get_device","data":{"account":""}};
+	json["data"]["account"]=account;
+	
+	$.post("/action",json,function callback(ret_data,status){
+		if(ret_data!=null &&ret_data!="")
+		{
+			var arr;
+			try
+			{
+				arr=JSON.parse(ret_data);
+			}
+			catch(err)
+			{
+				arr=eval(ret_data);	
+			}
+			
+			if(arr["code"]!=undefined &&arr["code"]==0)
+			{	 
+				retReq==true;	
+				 if(arrdevice==null)
+				 {
+					 arrdevice=new Array();
+				 }
+				 else
+				 {
+					 arrdevice.length=0;
+				 }
+				 if(arr["data"]!= null && arr["data"]!="")
+				 {			
+					 arrdevice=arr["data"]["device_array"].slice();
+					 display_device(arr);
+					 devicelist=arr;
+				 }
+				 else
+				 {
+					 document.getElementById("devicelist_ul").innerHTML="<li id=\"addlist\" class=\"list\"  onmouseover=\"film_over('addlist',0);\" onmouseout=\"film_out('addlist',0)\"><a class=\"lista\" href=\"#\" onclick=\"add_fun();\"><img src=\"images/addcamera.png\" height=\"112\" width=\"200\" ></a><p>设备添加</p></li>";
+					 retReq==false;
+				 }
+			}
+			else
+			{
+				alert("获取设备列表失败。"); 
+			}
+		}
+		
+	});
+}
+
+
+function display_device(arr)
+{
+	 var  obj=document.getElementById("devicelist_ul");
+		  obj.innerHTML="";
+		  
+		for(var i =0;i< arr["data"]["device_array"].length;i++)
+		{
+		
+			var device=document.createElement("li");
+			device.id="device"+i;
+			device.className="list";
+			
+			var a=document.createElement("a");
+			a.id="a"+i;
+			a.className="lista";
+			a.href="#";
+			a.innerHTML="<img src=\"images/1.png\" onclick=\"connect(this)\" >";
+			a.onclick=function(){ };
+			device.appendChild(a);
+		
+			var span=document.createElement("p");
+			span.id="p"+i;
+			span.value=i;
+			span.innerHTML=arr["data"]["device_array"][i]["device_name"];
+			span.onclick=function(){};
+			device.appendChild(span);
+			
+			device.onmouseover=function(){film_over(this.id,1) };				
+			device.onmouseout=function(){film_out(this.id,1)};	
+			/*if(arr["data"]["device_array"][i]["device_owner"]==null || arr["data"]["device_array"][i]["device_owner"]=="")
+			{
+				device.onmouseover=function(){film_over(this.id,1) };				
+				device.onmouseout=function(){film_out(this.id,1)};	
+			}	
+			else
+			{
+				device.onmouseover=function(){film_over(this.id,0) };				
+				device.onmouseout=function(){film_out(this.id,0)};	
+			}*/
+			obj.appendChild(device);
+		}				
+		//obj.innerHTML=obj.innerHTML+" "+html;
+		var device=document.createElement("li");
+		device.id="addlist";
+		device.className="list";
+		
+		var a=document.createElement("a");
+		a.id="a"+i;
+		a.className="lista";
+		a.href="#";
+		a.innerHTML="<img src=\"images/addcamera.png\" >";
+		a.onclick=function(){add_fun();};//document.getElementById('div_ocx').style.display='none';
+		device.appendChild(a);
+	
+		var p=document.createElement("p");
+		p.id="p"+i;
+		p.innerHTML="设备添加";
+		device.appendChild(p);
+		device.onmouseover=function(){film_over(this.id,0);};				
+		device.onmouseout=function(){film_out(this.id,0)};		
+		obj.appendChild(device);		
+}
+
+
+function add_fun()
+{
+	var display = ocx_display;
+	var obj = document.getElementById('div_ocx');
+	if(display == 'block')
+	{	
+		obj.style.height="0%";
+		obj.style.width="0%";	
+	}
+	find();
+	document.getElementById('div_mask').style.display='block';
+	document.getElementById('div_overlay').style.display='block'; 	
+	obj.style.display=ocx_display;
+}
+
+function get_number(str)
+{
+	var result = str.match(/\d+\.*\d*/g);
+	result = result[result.length-1];
+	return result;
+}
+
+function del_device(sel_id)
+{
+	var account= getCookie("username");
+	//var sel_sn=document.getElementById(sel_id).value;//选择的序号
+	var sel=get_number(sel_id);
+	var json={"cmd":"del_device","data":{"account":"","device_sn":""}};
+	
+	json["data"]["account"]=account;
+	json["data"]["device_sn"]=devicelist["data"]["device_array"][sel]["device_sn"];
+	
+	$.post("/action",json,function callback(ret_data,status){
+		if(ret_data!=null &&ret_data!="")
+		{
+			var arr;
+			try
+			{
+				arr=JSON.parse(ret_data);
+			}
+			catch(err)
+			{
+				arr=eval(ret_data);	
+			}
+			
+			if(arr["code"]!=undefined &&arr["code"]==0)
+			{	 
+				devicelist="";
+				get_device_list();
+			}
+			else
+			{
+				alert("删除设备失败。"); 
+			}
+		}
+		
+	});
+}
+
+function get_plugin()
+{
+	
+	var userAgent = navigator.userAgent.toLowerCase();
+	// Figure out what browser is being used
+	jQuery.browser = {
+	    version: (userAgent.match( /.+(?:rv|it|ra|ie)[/: ]([d.]+)/ ) || [])[1],
+	    safari: /webkit/.test( userAgent ),
+	    opera: /opera/.test( userAgent ),
+	    msie: /msie|Trident/.test( userAgent ) && !/opera/.test( userAgent ),
+	    mozilla: /mozilla/.test(userAgent)&&!/(compatible|webkit)/.test(userAgent)
+	};
+	
+	
+
+	if(jQuery.browser.msie==true)
+	{
+		ocx_display="'none'";
+		browser = 0;
+		//plugin="classid='CLSID:C191BBF1-BD88-4835-907B-22804135F0A1';";
+		$('#PlayerPlugin').removeAttr("type");
+		$('#PlayerPlugin').attr("classid","CLSID:C191BBF1-BD88-4835-907B-22804135F0A1");
+		
+	}
+	else
+	{
+		ocx_display="'block'";
+		browser = 1;
+		//plugin="type='application/TVT-plugin'";
+		$('#PlayerPlugin').attr("type","application/TVT-plugin");
+		$('#PlayerPlugin').removeAttr("classid");
+	}	
+	
+	setTimeout("checkPlugins('HomeLink SightSuit')",500);
+}
+
+
+//js 从ocx里获得数据
+var searchlist="";
+var devicelist="";
+function find()  
+{
+	searchlist="";
+	var device = PlayerPlugin.GetDeviceList();  // js访问ocx里的函数
+	//alert(PlayerPlugin.GetDeviceList());
+	if(device != null && device !="")
+	{
+		var arr=null;
+		try
+		{
+			arr =JSON.parse(device);
+		}
+		catch(err)
+		{
+			try
+			{
+				arr = eval("("+device+")");
+			}
+			catch(err)
+			{
+
+				alert("Json数据解析失败。");
+				return;
+			}
+			
+		}
+		displaydevice(arr);
+		searchlist=arr;
+		
+		return; 
+	} 
+	//alert(arr["data"]["device_array"][0]["device_sn"]);   
+	var obj=document.getElementById("device_list");
+	obj.innerHTML="<span>没有搜索到设备</span>";
+
+}
+
+function displaydevice(arr)
+{
+	var obj=document.getElementById("device_list");
+	obj.innerHTML="";
+	for(var i =0;i< arr["data"]["device_array"].length;i++)
+	{
+	
+		var device=document.createElement("div");
+		device.id="device"+arr["data"]["device_array"][i]["type"]+i;
+		device.className="devicel";
+		
+		var sn=document.createElement("span");
+		sn.id="sn"+arr["data"]["device_array"][i]["type"]+i;
+		sn.className="s_device";
+		sn.innerHTML=arr["data"]["device_array"][i]["deviceSN"];
+		sn.onclick=function(){};
+		device.appendChild(sn);
+	
+		var ip=document.createElement("span");
+		ip.id="sn"+arr["data"]["device_array"][i]["type"]+i;
+		ip.className="s_device";
+		ip.innerHTML=arr["data"]["device_array"][i]["ipv4Addr"];
+		ip.onclick=function(){};
+		device.appendChild(ip);
+	
+		var img=document.createElement("img");
+		img.id="img"+arr["data"]["device_array"][i]["type"]+i;
+		if(devicelist != "")
+		{
+			for(var j=0; j<devicelist["data"]["device_array"].length; j++)
+			{
+				if(arr["data"]["device_array"][i]["deviceSN"] == devicelist["data"]["device_array"][j]["device_sn"])
+				{
+					break;
+				}			
+			}
+
+			if( j == devicelist["data"]["device_array"].length)
+			{
+				img.src="images/add.png";
+				//device.onmouseover=function (){this.lastChild.style.display="inline-block";}				
+				///device.onmouseout=function (){this.lastChild.style.display="none";};
+				img.onclick=function(){adddevice(this);};
+				img.style.cursor="pointer";
+			}
+			else
+			{
+				img.src="images/suo.png";
+				img.style.display="inline-block";			
+			}
+		}
+	
+		else
+		{
+			img.src="images/add.png";
+			//device.onmouseover=function (){this.lastChild.style.display="inline-block";}				
+			///device.onmouseout=function (){this.lastChild.style.display="none";};
+			img.onclick=function(){adddevice(this);};
+			img.style.cursor="pointer";			
+		}
+
+		device.appendChild(img);			
+		obj.appendChild(device);
+	}				
+}
+
+function adddevice(obj)
+{
+	var sn=obj.parentNode.childNodes[0].innerHTML;
+	var ip=obj.parentNode.childNodes[1].innerHTML;
+	var ower=getCookie("username");
+	var session_id=getCookie("session_id");
+	var password =  getCookie("passwd");
+    var n=obj.parentNode.childNodes[0].id[obj.parentNode.childNodes[0].id.length-1]-0;
+	var port= searchlist["data"]["device_array"][n]["dataport"];
+
+	var info = "{\n\"deviceSN\":\""+sn+"\",\n"+"\"ipv4Addr\":\""+ip+"\",\n"+"\"dataport\":\""+port+"\",\n"+"\"deviceOwner\":\""+ower+"\",\n"+"\"password\":\""+password+"\",\n"+"\"session_id\":\""+session_id+"\"\n}";
+	//var d_son=JSON.stringify(info);
+	var flag=PlayerPlugin.AddDevice(info);
+	
+	if(flag == '1')
+	{
+		alert("绑定成功"); 
+		get_device_list(); 
+		find(); 	
+	}
+	else
+	{
+		alert("绑定失败");
+	}	
+}
+
+function close_div_overlay()
+{
+	var display = ocx_display;
+	var obj = document.getElementById('div_ocx');
+	if(display == 'block')
+	{	
+		obj.style.height="100%";
+		obj.style.width="100%";	
+	}
+	document.getElementById('div_overlay').style.display='none';
+	document.getElementById('div_mask').style.display='none';
+	obj.style.display='block';
+	get_device_list();
+	
+}
+
+function checkPlugins(pluginsName) {
+
+		var obj  = document.getElementById('ocxTip');
+		var obj1  = document.getElementById('div_ocx');
+		
+	
+		if(browser == 0)
+		{
+	 		if(PlayerPlugin.object)
+		 	{			
+	 			//control = new ActiveXObject("TVT.TVTCtrl.1");
+				if(PlayerPlugin.name != PlayerPlugin.GetPluginInfo())
+				{
+					obj.innerHTML="<a href=\"SightSuit.exe\" style=\"color: red;position: relative;top:300px;\"  >插件不是最新版，请点击此来升级插件，安装后请重启浏览器 </a>";
+					return;
+				}
+	 		}
+	 		else
+	 		{
+	 			obj.innerHTML="<a href=\"SightSuit.exe\" style=\"color: red;position: relative;top:300px;\"  >插件未加载到，请点击此来安装插件，安装后请重启浏览器 </a>";
+	 			return;
+	 		}			
+		}
+		else
+		{
+			//if(PlayerPlugin.GetPluginInfo)
+			if(PlayerPlugin.GetDeviceList)
+			{	
+				var verison = PlayerPlugin.GetPluginInfo();
+				if(PlayerPlugin.name != verison)
+				{
+					obj.innerHTML="<a href=\"SightSuit.exe\" style=\"color: red;position: relative;top:300px;\"  >插件不是最新版，请点击此来升级插件，安装后请重启浏览器 </a>";
+					return;
+				}			
+				//navigator.plugins[pluginsName] ;		 
+	 		}
+	 		else
+	 		{ 
+	 			
+	 			obj.innerHTML="<a href=\"SightSuit.exe\" style=\"color: red;position: relative;top:300px;\"  >插件未加载到，请点击此来安装插件，安装后请重启浏览器  </a>";
+	 			return;
+	 		}				
+		}
+
+		obj.style.display="none";
+		obj1.style.width="100%";
+		obj1.style.height="100%";
+}
+
+
+function connect(obj)
+{
+	
+	//var n=obj.parentNode.id[obj.parentNode.id.length-1]-0;
+	//var sn=devicelist["data"]["device_array"][n]["device_sn"];
+	var sn="008424430f69";
+	var ip="192.168.2.154"//devicelist["data"]["device_array"][n]["ipv4Addr"];
+	var ower="1@3.com";
+	var session_id="";
+	var password = "12345678";
+    
+	var port= ""//devicelist["data"]["device_array"][n]["dataport"];
+
+	var info = "{\n\"deviceSN\":\""+sn+"\",\n"+"\"ipv4Addr\":\""+ip+"\",\n"+"\"dataport\":\""+port+"\",\n"+"\"deviceOwner\":\""+ower+"\",\n"+"\"password\":\""+password+"\",\n"+"\"session_id\":\""+session_id+"\"\n}";
+	//var d_son=JSON.stringify(info);
+	var flag=PlayerPlugin.QequestLiveStream(info);
+	if(flag == '0')
+	{
+		//document.getElementById("waiting").style.display="none";
+		document.getElementById('div_ocx').style.display='block';
+		alert("请重试");	
+	}
+	else
+	{
+		//document.getElementById("waiting").style.display="none";
+		document.getElementById('div_ocx').style.display='block';
+		//alert("请重试");
+	}	
+}
+
+
+
+</script>
+</head>
+<body >
+<div id="top">
+<div style="min-width: 500px;">
+		<div id="d_live"><a  href="Home.html"><img id="" src="images/flag.png" /><span>Pi-live</span></a></div>	
+		<div id="d_username">
+		<ul class="clear">
+		<li>
+		<span style="height:32px;font-size:24px; line-height:40px;padding-right:20px;cursor: pointer;">MyCamera</span>
+		</li>
+        <li style="border:none;">
+        <a href="#" style="height:32px;border:none;margin-left:20px;">
+       		 <img src="images/user.png" />        	
+            <span id="username" style="height:32px;font-size:24px;text-shadow:none;">...</span>
+            <span class="Darrow"></span>
+             </a>
+        	<dl >
+            	<dt><span class="arrow" style="float:right;"></span></dt>
+                <dd ><a href="Account.html" style="font-size:19px;padding:0px;">Account Management</a></dd>
+                <dd><a href="#" style="font-size:19px;padding:0px;" onclick="signOut()">Log Out</a></dd>
+            </dl>           
+        </li>
+		</ul>
+		
+		</div>
+  	</div>	
+  </div>
+  	<div id="d_center">
+  		<!-- <span>Home: Living room</span>   -->
+  	</div>
+  	<div style="width: 1100px;height:650px; position: relative; margin:auto;">
+
+  	  	 <div id="cameralist" style="position:relative;margin:0px 24px 0px 20px;float:left;background:#eee;">
+  	  	 <div style="font-size:29px;">My Camera</div>
+  		<!-- <div><img src="images/up.png" onclick="if(stop == 0)int = setInterval('MoveVertical(\'up\',150)',30);"></div>   -->	
+  		<div id="slide_scroll" class="slide_con">
+  			<ul id="devicelist_ul" class="listul">  	
+  			  <!-- <li id="list1" class="list"  onmouseover="film_over('list1',1);" onmouseout="film_out('list1',1)"><a class="lista" href="#"   ><img src="images/1.png" alt="" ></a><p>MyCamera1</p></li>
+	  			<li id="list2" class="list"  onmouseover="film_over('list2',1);" onmouseout="film_out('list2',1)"><a class="lista" href="#"  ><img src="images/2.png" alt="" ></a><p>MyCamera2</p></li>
+	  			<li id="list3" class="list"  onmouseover="film_over('list3',1);" onmouseout="film_out('list3',1)"><a class="lista" href="#"  ><img src="images/3.png" alt="" ></a><p>WWWWWWWWWWFWWWWWWWWS</p></li> 
+				<li id="list4" class="list"  onmouseover="film_over('list4',1);" onmouseout="film_out('list4',1)"><a class="lista" href="#"  ><img src="images/1.png" alt="" ></a><p>MyCamera4111</p></li>
+				<li id="list5" class="list"  onmouseover="film_over('list5',1);" onmouseout="film_out('list5',1)"><a class="lista" href="#"  ><img src="images/2.png" alt="" ></a><p>MyCamera5</p></li>
+				<li id="addlist" class="list"  onmouseover="film_over('addlist',0);" onmouseout="film_out('addlist',0)"><a class="lista" href="#" onclick="find();document.getElementById('div_overlay').style.display='block'; document.getElementById('div_ocx').style.display='none';" ><img src="images/addcamera.png" alt="" height="112" width="200" ></a><p>添加设备</p></li>
+				 -->  	
+	  		</ul>
+  		</div> 	
+      </div>
+
+
+  	
+  	<div id="center" style="float:left;background:#eee;text-align:center;border:1px;border-color:red;"> 	
+		<div>
+  		<span id="ocxTip" >	插件加载中，请稍后。。。。</span>
+  		
+  		 <div id="div_ocx" style="width:1px; height: 1px;background-color: #eee; float:left;">
+			<object   id='PlayerPlugin' type="" classid=""  width="100%" name="1.0.0.1" height="100%" >
+                 </object>      
+        </div>
+        </div>
+    	<!-- <iframe   style="background-color:transparent;display:none;width:100%;height:100%;top:0px;position:absolute;"></iframe> -->
+  	</div>
+  	</div> 
+  <div style="margin-top: 50px;">
+		<!-- <hr style="width: 80%; height: 2px;" size="1" color="#666666"> -->
+		<div style="text-align: center;height:50px;margin-bottom:20px;width:100%;min-width:1100px;background-color:#DDDDDD;line-height:50px;">
+			<span>Copyright © 2003–2014,TVT.CN,All Rights Reserved.</span>
+		</div>
+	</div>
+  	 <div id="div_mask" class="mask" style="display: none"></div>
+  	  <div id="div_overlay"  style="display:none;">
+ 		 <div id="addcamera" > 
+  	 		<div id="close" >
+  	 		  <div id="q_juyu" class="c_add" onclick="search_device('q_juyu', 'q_sn', 'device_list', 'device_sn');" >局域网扫描添加</div> 
+  	 		  <!-- <div id="q_sn" class="c_add"   onclick="search_device('q_sn', 'q_juyu', 'device_sn', 'device_list');" >序列号查询添加</div> -->
+  	 		   <a  href="#" onclick="close_div_overlay()"><img id="" src="images/close.png" /></a> </div>
+  	 		<div id="device_list" class="devicelist"  onmouseover="int = setInterval('find()',1000);" onmouseout="window.clearInterval(int);" >
+			</div>
+			 <div id="device_sn" class="devicelist" style="display:none;">
+			
+			   <div class="d_text">
+					<span  class="s_text">序列号:</span><input id="i_sn"  class="i_text" type="text" maxlength="40" style="width: 160" >
+					<input id="btnsearch" type="button"  value="搜索" onclick="search_device_bind()">
+				</div>
+						
+			 <div id="s_devicel_sn" class="devicel"  style="display:none; left: 40%;">			
+					<span id="s_sn"       class="s_device">1</span>
+					<span id="s_ip"       class="s_device">2</span>
+					<img id="i_add" src="images/add.png" alt="" height="30" width="30"  style="display:none;">
+					<img id="i_suo" src="images/suo.png" alt="" height="30" width="30"  style="display:none;">			
+			 </div>
+			</div>
+  	 	</div>	
+  	</div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sign up</title>
+<script src="js/jquery-1.11.1.js"></script>
+<script src="js/av.js"></script>
+<script type="text/javascript" src="js/check.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/json2.js"></script>
+<script type="text/javascript" src="Lang/lang.js"></script>
+<script>
+
+
+
+function chkinput_register()
+{
+	var str="";
+	/*if((str=checkUserNameEx(trim(document.getElementById("Inaccount").value))) !="")
+	{
+		document.getElementById("tipMsg").innerHTML=str;
+		document.getElementById("Inaccount").focus();
+		return false;
+	}*/
+	
+	if((str=checkCellphone(document.getElementById("Inaccount").value))!="")//手机号作为账号
+	{
+		document.getElementById("tipMsg").innerHTML=str;
+		return false;
+	}
+	
+	if((str=checkPassward(document.getElementById("InPassword").value))!="")
+	{
+		document.getElementById("tipMsg").innerHTML=str;
+		document.getElementById("InPassword").focus();
+		return false;
+	}
+	
+	if(document.getElementById("InPassword").value != document.getElementById("InPasswordcf").value)
+	{
+		document.getElementById("tipMsg").innerHTML=jsLangArr.ComparePassword;
+		return false;
+	}
+
+
+	
+	/*if(document.getElementById("cellVerifycode").value.length<6)
+	{
+		document.getElementById("tipMsg").innerHTML="请输入正确的验证码.";
+		return false;
+	}*/
+	return true;
+}
+
+function registerUser()
+{	
+	/*$("#first").css("display","none");
+	$("#next").css("display","block");
+	$("#sec_cell").html($("#cellNum").val());
+	return;*/
+
+	if(chkinput_register() ===false)
+		return;
+	var account= trim(document.getElementById("Inaccount").value);
+	var password=document.getElementById("InPassword").value;
+	//var cellphone=document.getElementById("cellNum").value;
+	
+ 	var json={"cmd":"sms_register","data":{"password":"","cellphone":""}};
+	//json["data"]["account"]=account;
+	json["data"]["password"]=password;
+	json["data"]["cellphone"]=account;
+
+	
+	$.post("/action",json,function callback(ret_data,status){
+		if(ret_data!=null &&ret_data!="")
+		{
+			
+			var arr;
+			try
+			{
+				arr=JSON.parse(ret_data);
+			}
+			catch(err)
+			{
+				arr=eval(ret_data);	
+			}
+			
+			if(arr["code"]!=undefined &&arr["code"]==0)
+			{
+				alert("注册成功");	
+				$("#first").css("display","none");
+				$("#next").css("display","block");
+				$("#sec_cell").html($("#Inaccount").val());
+			}
+			else
+			{
+				document.getElementById("tipMsg").innerHTML=arr["desc"];
+			}
+		}
+	});
+}
+
+function requestSmsCode()
+{
+	setCookie("sign_up_time",Date.parse(new Date()),time);
+	var cellphone=document.getElementById("Inaccount").value;
+	var json={"cmd":"get_reg_sms","data":{"cellphone":""}};
+	
+	json["data"]["cellphone"]=cellphone;
+	
+	$.post("/action",json,function callback(ret_data,status){
+		if(ret_data!=null &&ret_data!="")
+		{
+			var arr;
+			try
+			{
+				arr=JSON.parse(ret_data);
+			}
+			catch(err)
+			{
+				arr=eval(ret_data);	
+			}
+			
+			if(arr["code"]!=undefined &&arr["code"]==0)
+			{
+				alert("验证码已发送.");	
+			}
+			else
+			{
+				document.getElementById("tipMsg").innerHTML=arr["desc"];
+			}
+		}
+		
+	});
+	
+}
+
+function verifyCellphone()
+{
+	var vcode=document.getElementById("cellVerifycode").value;
+	var json={"cmd":"verify_cellphone","data":{"sms_code":""}};
+	
+	json["data"]["sms_code"]=vcode;
+	
+	
+	$.post("/action",json,function callback(ret_data,status){
+		if(ret_data!=null &&ret_data!="")
+		{
+			var arr;
+			try
+			{
+				arr=JSON.parse(ret_data);
+			}
+			catch(err)
+			{
+				arr=eval(ret_data);	
+			}
+			
+			if(arr["code"]!=undefined &&arr["code"]==0)
+			{
+				alert("验证成功.");	
+				window.location="SignIn.html";
+			}
+			else
+			{
+				document.getElementById("tipMsg").innerHTML=arr["desc"];
+			}
+		}
+		
+	});
+}
+
+
+var wait=60;
+window.onload=function (){
+	var pretime=getCookie("sign_up_time");
+	var curtime=Date.parse(new Date());
+	var timespan=(curtime-pretime)/1000;//精确到秒
+	if(0<timespan&&timespan<60)
+	{
+		wait=60 - timespan;
+		time(document.getElementById("getVerify"));
+	}
+}
+
+function time(obj) { 
+	if (wait == 0) {
+		obj.removeAttribute("disabled");
+		//obj.style.background="green"; 
+		obj.value="获取验证码";
+		//document.getElementById("msg").innerHTML="";
+		wait = 60;
+	} 
+	else
+	{ 
+		obj.setAttribute("disabled", true);
+		//obj.style.background=""; 
+		obj.value=wait+"秒后可重发"; 
+		wait--; 
+		setTimeout(function() { time(obj) }, 1000); 
+	} 
+} 
+
+
+</script>
+<link rel="stylesheet" type="text/css" href="css/signup.css">
+</head>
+<body>	
+	<div id="top">
+		<div id="d_live"><a  href="Home.html"><img id="" src="images/flag.png" /><span>Pi-live</span></a></div>		
+  	</div>	
+ 	
+  	<div id="center">
+  		<!-- <div id="left">
+  			<img id="" src="images/xingkong.png" />
+  		</div> -->
+  		<div style="font-size: 24px;color:black;text-align:left;margin:10px 0px 0px 20px">创建账号</div>
+  		<hr style="width:870px;margin:10px 0px 0px 0px;float:left;">
+  		<div id="right">
+  		
+  		<form  id="signOnform" >
+		  		<div id="errorMsg" >
+		  				<span id="tipMsg" style=" position: relative; top: 5px"></span>
+		  			</div>
+		  			<div id="first">			
+  					<div style="margin-top:10px;float:left;">
+  					<div class="c_label_l">账号:</div><input type="text" id="Inaccount"    name="t_account"    value="手机号" maxlength="60" onfocus="onclick1('Inaccount');" onBlur="onBlur1('Inaccount');clearErrorMsg();" /><img id="chk_acc_ret" src="images/correct.png" style="display: none"/>
+  					</div>
+  					<div style="margin-top:10px;float:left;"><div class="c_label_l">密码:</div><input type="text" id="InPasswordtip"   name="InPasswordtip"   value="密码" onfocus="onclick2('InPasswordtip','InPassword');" />
+  							  <input type="password" id="InPassword"   name="t_password"   value="" maxlength="20" onBlur="onBlur2('InPassword','InPasswordtip');clearErrorMsg();" />	
+  					</div>
+  					<div style="margin-top:10px;float:left;"><div class="c_label_l">确认密码:</div><input type="text" id="InPasswordcftip"   name="InPasswordtip"   value="确认密码" onfocus=" onclick2('InPasswordcftip','InPasswordcf');" />
+  							  <input type="password" id="InPasswordcf"   name="InPassword"   value="" maxlength="20" onfocus="" onBlur="onBlur2('InPasswordcf','InPasswordcftip');clearErrorMsg();" /></div>
+  					<!--  <div style="margin-top:10px;float:left;"><div class="c_label_l">手机号:</div><input type="text" id="cellNum" name="cellphone"></div>-->  							  
+  					<div style="margin-top:10px;float:left;"><input type ="button" id="submitUp"  value ="下一步" onclick="registerUser();"></div>
+  					</div>
+  					<div id="next" style="display:none;margin-top:20px;">
+	  					<div><span class="c_label_l">手机号:</span><span id="sec_cell" ></span></div>
+						<div><div class="c_label_l" >手机验证码:</div><input type="text" id="cellVerifycode" size="6" maxlength="6"><input type="button" id="getVerify" value="获取验证码" onclick="requestSmsCode();time(this);"></div>
+						<div ><input type ="button" id="verifyphone"  value ="完成" onclick="verifyCellphone();"></div>
+					</div>
+  			</form>	
+  			<div style="float:left;margin:20px 0px 0px 200px;"><a href="SignIn.html" style="float: left">登录</a>
+			<span class="c_line" ></span>
+			<a href="ResetPassword.html" style="float: left">忘记密码?</a></div>
+  		</div>
+  	</div>
+  	<div style="margin-top: 50px;">
+		<!-- <hr style="width: 80%; height: 2px;" size="1" color="#666666"> -->
+		<div style="text-align: center;height:50px;margin-bottom:20px;min-width:1100px;background-color:#DDDDDD;line-height:50px;">
+			<span>Copyright © 2003–2014,TVT.CN,All Rights Reserved.</span>
+		</div>
+	</div>
+</body>
+</html>

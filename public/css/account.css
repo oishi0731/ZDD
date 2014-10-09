@@ -1,0 +1,604 @@
+@CHARSET "UTF-8";
+
+a
+{
+	TEXT-DECORATION: none;			
+}
+body{
+	padding:0px;
+	margin:0px;
+}
+
+
+.c_line
+{
+	float:left;
+	width:2px;
+	height:400px;
+	background: #000;
+	margin:100px 0px 0px 0px;
+}
+
+/*主页样式 */
+#top
+{
+	position: relative;
+	/*width: 1280px;*/
+	min-width:1100px;
+	width:100%;
+	height: 60px;
+	margin: 0px auto;
+	background: #2c86ee; 	
+}
+
+#d_live
+{
+	float: left;
+	height: 100%;
+	color: #fff;
+	font-size: 40px;
+	margin-left: 130px;	
+	text-align: center;
+}
+
+#d_live a
+{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	color: #fff;
+	font-size: 40px;
+	top: 7px;
+	border: 0px;
+}
+
+#d_live img
+{
+	float: left;
+	width: 45px;
+	height: 45px;
+	margin-top: 0px;
+	border: 0px;
+}
+
+#d_live span
+{
+	float: left;
+	font-size: 40px;
+	margin-left: 20px;
+	color: #fff;
+	margin-top: 0px;
+}
+
+#top a
+{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: block;
+	font-size: 20px;
+	color: #000;		
+}
+
+#d_camera a:hover, #d_House a:hover,#top a:hover
+{ 
+	color:#F00;/*鼠标经过链接时颜色*/
+}
+
+#d_camera a:active, #d_House a:active
+{ 
+	color:#30F; /*鼠标点击链接时颜色*/
+}
+
+#account
+{
+	position: relative;
+	display: block;
+	margin: 0px auto;
+	margin-top: 10px;
+}
+
+#language
+{
+	position: relative;
+	display: block;
+	margin: 0px auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#signout
+{
+	position: relative;
+	display: block;	
+	margin: 0px auto;
+	margin-top: 10px;
+}
+
+#language_menu
+{
+	position: relative;
+	width: 100px;
+	height: 70px;
+	left: 1049px;
+	top: -90px;	
+	z-index: 200;
+	border: 1px solid #0d4e94;
+	box-shadow: 1px 2px 1px 0px rgba(0, 0, 0, 0.07);
+	background: #e1e1e1;	
+	display: none;
+}
+
+#zh_CN
+{
+	position: relative;
+	display: block;
+	margin: 0px auto;
+	margin-top: 10px;
+}
+
+#en
+{
+	position: relative;
+	display: block;
+	margin: 0px auto;
+	margin-top: 10px;
+	margin-bottom: 00px;
+}
+
+#language_menu a
+{
+	width: 100%;	
+	height: 20px;
+	color:#000;
+}
+
+#language_menu a:hover
+{ 
+	
+	background: #f1f8ff;
+}
+
+#language_menu a:active
+{ 
+	
+}
+
+#center
+{
+	position: relative;
+	width: 1100px;
+	height: 600px;
+	margin: 0px auto;
+	background: #f0f0f0;
+ 			
+}
+
+#left
+{
+	float: left;
+	width: 500px;
+	height: 600px;
+	margin: 0px auto;
+	background: #f0f0f0;
+	border-radius: 10px;
+	text-align:left;		
+}
+
+#right
+{
+	float: left;
+	width: 550px;
+	height: 600px;
+	background: #f0f0f0;
+	border-radius: 10px;
+	text-align:left;		
+}
+
+#accountlist
+{
+	position: relative;
+	width: 100%;
+	height: 700px;
+	font-size: 20px;
+	margin-top: 5px;		
+}
+
+#me
+{
+	position: relative;
+	width: 90%;
+	height: 80px;
+	background: #f0f0f0;
+	margin: 0px auto;
+	border-top: 1px;
+	border-bottom-style: solid;
+    border-bottom-color: #9ac1ef;
+    cursor: pointer;
+}
+
+#friendlist
+{
+	position: relative;
+	width: 93%;
+	height: 600px;
+	margin-left: 31px;
+	overflow: auto;	
+}
+
+.c_friend
+{
+	position: relative;
+	width: 573px;
+	height: 80px;
+	background: #f0f0f0;
+	border-top: 1px;
+	border-bottom-style: solid;
+    border-bottom-color: #9ac1ef;
+    cursor: pointer;	
+}
+
+.c_avatar
+{
+	float: left;
+	width: 20%;
+	height: 100%;
+}
+
+.c_name
+{
+	float: left;
+	width: 340px;
+	height: 25px;
+	margin-top: 10px;
+	display: inline-block;
+	text-align: left;
+}
+
+.c_type 
+{
+	float: right;
+	width: 100px;
+	height: 25px;
+	margin-top: 10px;
+	text-align: right;
+	margin-right: 15px;
+}
+
+.c_type span
+{
+	position: relative;
+	
+}
+
+.c_account_name
+{
+	float: left;
+	width: 55%;
+	height: 25px;
+	margin-top: 10px;
+	text-align: left;
+}
+
+.c_funtion
+{
+	float: right;
+	width: 25%;
+	height: 25px;
+	margin-top: 10px;
+	text-align: right;
+}
+
+#m_submitchange
+{
+	width: 80px;
+	height: 30px;
+	color: #fff;
+	background: #2c86ee;
+	border-radius:10px;
+	border:none;
+	margin-right: 10px;
+}
+
+.c_submitagree , .c_camera
+{
+	float: left;
+	width: 60px;
+	height: 30px;
+	color: #fff;
+	background: #2c86ee;
+	border-radius:10px;
+	border:none;
+	margin-right: 10px;
+	margin-left: 10px;	
+}
+
+.c_submitignore
+{
+	float: right;
+	width: 60px;
+	height: 30px;
+	color: #fff;
+	background: #2c86ee;
+	border-radius:10px;
+	border:none;
+	margin-right: 10px;
+	margin-top: -30px;	
+}
+
+
+.c_submitdelete
+{
+	position: relative;
+	width: 30px;
+	height: 30px;
+	background-image: url(../images/del.png);
+	border-radius:10px;
+	border:none;
+	margin-right: 20px;
+}
+
+
+.c_submitdelete, .c_camera
+{
+	display: none;
+}
+
+#addfriend
+{
+	position: relative;
+	width: 80%;
+	height: 475px;
+	color: #000;
+	background: #deebff;
+	border-radius: 10px;
+	border:none;
+	margin: 0px auto;	
+}
+
+#submit_info , #f_submit_info
+{
+	position: relative;
+	width: 80px;
+	height: 30px;
+	color: #fff;
+	background-color: #2c86ee;
+	border-radius:10px;
+	border:none;
+}
+
+#info, #f_info, #camera_info
+{
+	position: relative;
+	top: 40px;	
+	width: 80%;
+	height: 500px;
+	background: #deebff;
+	border-radius: 10px;
+	margin: 0px auto;
+	display: none;
+}
+
+#f_info .i_text
+{
+	background-color: #aaaaaa;	
+}
+
+#password
+{
+	position: relative;
+	top: 40px;
+	width: 80%;
+	height: 450px;
+	background: #deebff;
+	border-radius: 10px;
+	margin: 0px auto;	
+}
+
+#searchFriend, #addFriend, #btngroup
+{
+	position: relative;
+	width: 80px;
+	height: 30px;
+	color: #fff;
+	background: #2c86ee;
+	border-radius:10px;
+	border:none;
+}
+
+#btnpasswd
+{
+	position: relative;
+	width: 200px;
+	height: 40px;
+	color: #fff;
+	font-size:20px;
+	background: #2c86ee;
+	border-radius:10px;
+	border:none;
+	margin:30px 0px 0px 240px;
+}
+
+
+.d_text
+{
+	position: relative;
+	width: 80%;
+	margin: 0px auto;
+}
+
+.s_text
+{
+	float: left;
+	width: 150px;
+	height: 30px;
+	text-align: right;
+	margin:20px 0px 0px 15px;
+	font-size: 20px;	
+}
+
+.i_text
+{
+	position: relative;
+	display: inline-block;
+	border: 1px;
+	border-style: solid;
+    border-color: #9ac1ef;
+	width: 250px;
+	height: 40px;
+	font-size: 20px;
+	margin:10px 0px 0px 20px;
+}
+
+.d_info
+{
+	position: relative;
+	width: 80%;
+	margin: 10px auto;
+	font-size: 30px;
+}
+
+.d_password
+{
+	position: relative;
+	width: 80%;
+	margin: 10px auto;
+	font-size: 30px;
+}
+
+#friend_acc, #nofind
+{
+	position: relative;
+	width: 90%;
+	height: 300px;
+	font-size: 15px;
+	margin: 10px auto;	
+
+}
+
+.c_group
+{
+	position: relative;
+	display: inline-block;
+	border: 1px;
+	border-style: solid;
+    border-color: #9ac1ef;
+	width: 200px;
+	height: 30px;
+	font-size: 20px;
+	margin-bottom: 10px;
+	margin-left: -40px;	
+}
+
+.c_group select
+{
+	float: left;
+	width: 50%;
+	font-size: 15px;
+	height: 100%;
+}
+
+#delpassword
+{
+    background: #e1e1e1;  
+	position: absolute;	
+	width: 500px;
+	height: 200px;
+	top: 200px;
+	left: 35%;	
+	border-radius:10px;	
+	font-size: 20px;	
+}
+
+#delpassword div
+{
+	top: 30px;
+	margin-top: 10px;
+}
+
+
+#divMsg
+{ 
+   position: absolute;
+   top: 0%;
+   left: 0%;
+   width: 100%;	
+   height: 100%;
+   margin: 0px auto;
+   background: rgba(0, 0, 0, 0.0) !important; /* IE无效，FF有效 */
+   background-color: black;
+   z-index:1010;
+   filter: alpha(opacity=100);
+}
+
+.showMsg
+{
+	background: #FFFFFF;  
+	position: absolute;	
+	width: 500px;
+	height: 250px;
+	top: 200px;
+	left: 30%;	
+	border-radius:10px;	
+	font-size: 20px;
+
+}
+
+.showMsg div
+{
+	top: 30px;
+	margin-top: 10px;
+}
+
+#close
+{
+	float: right;
+	margin-top: 0px;
+	margin-right: 10px;
+}
+
+#close img
+{ 
+	border:none;
+}
+
+#close_msg
+{
+	float: right;
+	margin-top: 0px;
+	margin-right: 10px;
+}
+
+#close_msg img
+{ 
+	border:none;
+}
+
+#div_overlay, #div_group
+{ 
+   position: absolute;
+   top: 0%;
+   left: 0%;
+   width: 100%;	
+   height: 100%;
+   margin: 0px auto;
+   background: rgba(0, 0, 0, 0.0) !important; /* IE无效，FF有效 */
+   background-color: black;
+   z-index:1010;
+   filter: alpha(opacity=100);
+}
+
+.mask
+{	
+	position: fixed;
+	top: 0%;
+	left: 0%;
+	width: 100%;	
+	height: 100%; 
+	margin: 0px auto;
+    background: rgba(0, 0, 0, 0.8) !important; /* IE无效，FF有效 */
+    background-color: black;
+    z-index:100;
+    filter: alpha(opacity=80);
+}
+

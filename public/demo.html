@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="js/av.js"></script>
+<script type="text/javascript">
+window.load=function()
+{
+	var query = AV.Query(AV.User);
+	query.equalTo(id, "002");
+	query.find({
+		success:function(results) {
+			if(results==null || results="")
+			return "query nothing.";				
+			return results;
+		},
+		error: function(error) {
+			return error.code+":" + error.message;
+		}
+	});
+}
+</script>
+</head>
+<body>
+
+</body>
+</html>
